@@ -33,7 +33,7 @@ const CurrencyExchange: React.FC = () => {
             //Check if the data is already in localstorage and if it's less than 24 hours old
             const storedData = localStorage.getItem('exchangeRates');
             const storedTime = localStorage.getItem('exchangeRatesTime');
-            const apiKey = import.meta.env.VITE_EXCHANGE_RATE_API_KEY;
+            const apiKey = import.meta.env.VITE_OPEN_EXCHANGE_API_KEY;
 
             if (storedData && storedTime) {
                 const currentTime = new Date().getTime();
@@ -51,15 +51,15 @@ const CurrencyExchange: React.FC = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `http://cors-anywhere.herokuapp.com/http://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`
+                    `https://openexchangerates.org/api/latest.json?app_id=${apiKey}`
                 )
                 
                 
                 const data = await response.json();
                 
-                if (data.result === "success") {
-                    setExchangeRates(data.conversion_rates);
-                    localStorage.setItem('exchangeRates', JSON.stringify(data.conversion_rates));
+                if (response.ok && data) {
+                    setExchangeRates(data.rates);
+                    localStorage.setItem('exchangeRates', JSON.stringify(data.rates));
                     localStorage.setItem('exchangeRatesTime', new Date().getTime().toString());
                 } else {
                     setError('Failed to fetch exchange rates')
